@@ -6,6 +6,23 @@
     "sharedGlobals": []
   },
   "nxCloudId": "689cba1bb0c1aa6925792d37",
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"],
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "inputs": ["default", "^default"],
+      "outputs": []
+    },
+    "start:dev": {
+      "cache": false,
+      "inputs": ["default", "^default"],
+      "outputs": []
+    }
+  },
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
