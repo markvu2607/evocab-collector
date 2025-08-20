@@ -1,0 +1,19 @@
+{
+  "name": "evocab-collector",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "markvu2607",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "24.6.0"
+  },
+  "packageManager": "pnpm@10.15.0",
+  "devDependencies": {
+    "nx": "21.4.0"
+  }
+}
