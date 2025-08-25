@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "Evocab collector extension",
+  "description": "Save any english vocabulary and import to quizlet",
+  "version": "0.0.1",
+  "action": {
+    "default_popup": "./index.html"
+  }
+}

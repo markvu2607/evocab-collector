@@ -1,29 +1,15 @@
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run `npm run deploy` to publish your worker
- *
- * Bind resources to your worker in `wrangler.jsonc`. After adding bindings, a type definition for the
- * `Env` object can be regenerated with `npm run cf-typegen`.
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
-
 import { Context, Hono } from 'hono';
 import { apiKeyMiddleware } from './middlewares/api-key.middleware';
-import Saved from './models/saved.model';
-import Word from './models/word.model';
-// import mongoose from 'mongoose';
+import { cors } from 'hono/cors';
 
-const app = new Hono();
+type Bindings = {
+	X_API_KEY: string;
+};
 
+const app = new Hono<{ Bindings: Bindings }>();
+
+app.use(cors());
 app.use(apiKeyMiddleware);
-
-app.get('/ping', (c) => {
-	return c.text('pong');
-});
 
 app.get('/search', async (c: Context) => {
 	const { keyword } = c.req.query();
@@ -42,17 +28,18 @@ app.get('/search', async (c: Context) => {
 
 	await Promise.all(
 		wordList.map(async (word) => {
-			const foundWord = await Word.findOne({ id: word.id });
+			const foundWord = await c.env.DB.prepare('SELECT * FROM words WHERE id = ?').bind(word.id).first();
 			if (!foundWord) {
-				const newWord = new Word(word);
-				newWord.save();
+				await c.env.DB.prepare('INSERT INTO words (id, content, position, trans, en_sentence, vi_sentence) VALUES (?, ?, ?, ?, ?, ?)')
+					.bind(word.id, word.content, word.position, word.trans, word.en_sentence, word.vi_sentence)
+					.run();
 			}
 		})
 	);
 
 	const wordStatus = await Promise.allSettled(
 		wordList.map(async (word) => {
-			const foundWord = await Word.findOne({ id: word.id });
+			const foundWord = await c.env.DB.prepare('SELECT * FROM saved WHERE id = ?').bind(word.id).first();
 			return !!foundWord;
 		})
 	).then((results) => {
@@ -69,6 +56,37 @@ app.get('/search', async (c: Context) => {
 	}));
 
 	return c.json({ data: wordList });
+});
+
+app.post('/save-word', async (c: Context) => {
+	const { id } = await c.req.json();
+
+	await c.env.DB.prepare('INSERT INTO saved (id) VALUES (?)').bind(id).run();
+
+	return c.json({
+		data: id,
+		message: 'Saved word',
+		statusCode: 200,
+	});
+});
+
+app.get('/random-word', async (c: Context) => {
+	const randomSaved = await c.env.DB.prepare('SELECT * FROM saved ORDER BY RANDOM() LIMIT 1').first();
+
+	if (!randomSaved) {
+		return c.json({
+			message: 'No saved word',
+			statusCode: 404,
+		});
+	}
+
+	const word = await c.env.DB.prepare('SELECT * FROM words WHERE id = ?').bind(randomSaved.id).first();
+
+	return c.json({
+		data: word,
+		message: 'OK',
+		statusCode: 200,
+	});
 });
 
 export default app;

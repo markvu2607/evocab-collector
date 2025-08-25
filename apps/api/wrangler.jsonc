@@ -11,9 +11,15 @@
 		"enabled": true
 	},
 	"vars": {
-		"MONGO_URL": "",
 		"X_API_KEY": ""
-	}
+	},
+	"d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "evocab-collector",
+      "database_id": "25268826-3f59-4515-aeee-788d403fb253"
+    }
+  ]
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
