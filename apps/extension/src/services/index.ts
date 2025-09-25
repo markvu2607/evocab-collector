@@ -1,7 +1,9 @@
+import type { Word } from "@/types";
+
 const API_URL = import.meta.env.VITE_API_URL;
 const X_API_KEY = import.meta.env.VITE_X_API_KEY;
 
-export const search = async (keyword: string) => {
+export const search = async (keyword: string): Promise<{ data: Word[] }> => {
   const queryParams = new URLSearchParams({
     keyword,
   });

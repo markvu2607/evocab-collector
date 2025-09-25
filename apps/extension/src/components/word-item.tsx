@@ -1,4 +1,5 @@
 import type { Word } from "../types";
+import { Button } from "./ui/button";
 
 type Props = {
   word: Word;
@@ -35,12 +36,12 @@ export const WordItem = ({ word, isSaving, onSave }: Props) => {
             {word.en_sentence} ({word.vi_sentence})
           </p>
         </div>
-        <button
+        <Button
           disabled={word.isSaved || isSaving}
           onClick={() => onSave(word)}
         >
           Save
-        </button>
+        </Button>
       </div>
     </div>
   );
