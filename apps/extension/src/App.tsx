@@ -4,6 +4,9 @@ import { SearchInput } from "./components/search-input";
 import { WordItem } from "./components/word-item";
 import { saveWord, search } from "./services";
 import type { Word } from "./types";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 function App() {
   const [keyword, setKeyword] = useState<string>("");
@@ -40,37 +43,39 @@ function App() {
   };
 
   return (
-    <div style={{ minWidth: "300px" }}>
-      <div>
-        <SearchInput
-          value={keyword}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            setKeyword(event.target.value)
-          }
-          isLoading={isSearching}
-          onSubmit={() => handleSearch(keyword)}
-        />
+    <QueryClientProvider client={queryClient}>
+      <div style={{ minWidth: "300px" }}>
+        <div>
+          <SearchInput
+            value={keyword}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              setKeyword(event.target.value)
+            }
+            isLoading={isSearching}
+            onSubmit={() => handleSearch(keyword)}
+          />
+        </div>
+        <div
+          style={{
+            marginTop: "20px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "4px",
+          }}
+        >
+          {wordList &&
+            wordList.map((word) => (
+              <div key={word.id}>
+                <WordItem
+                  word={word}
+                  isSaving={isSaving}
+                  onSave={(word) => handleSaveWord(word)}
+                />
+              </div>
+            ))}
+        </div>
       </div>
-      <div
-        style={{
-          marginTop: "20px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "4px",
-        }}
-      >
-        {wordList &&
-          wordList.map((word) => (
-            <div key={word.id}>
-              <WordItem
-                word={word}
-                isSaving={isSaving}
-                onSave={(word) => handleSaveWord(word)}
-              />
-            </div>
-          ))}
-      </div>
-    </div>
+    </QueryClientProvider>
   );
 }
 

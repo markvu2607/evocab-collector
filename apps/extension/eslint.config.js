@@ -20,4 +20,5 @@ export default tseslint.config([
       globals: globals.browser,
     },
   },
+  ...pluginQuery.configs['flat/recommended'],
 ])
