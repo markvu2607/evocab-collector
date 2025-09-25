@@ -4,6 +4,7 @@ import { cors } from 'hono/cors';
 
 type Bindings = {
 	X_API_KEY: string;
+	DB: D1Database;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -11,7 +12,7 @@ const app = new Hono<{ Bindings: Bindings }>();
 app.use(cors());
 app.use(apiKeyMiddleware);
 
-app.get('/search', async (c: Context) => {
+app.get('/search', async (c) => {
 	const { keyword } = c.req.query();
 
 	const queryParams = new URLSearchParams({
@@ -58,7 +59,7 @@ app.get('/search', async (c: Context) => {
 	return c.json({ data: wordList });
 });
 
-app.post('/save-word', async (c: Context) => {
+app.post('/save-word', async (c) => {
 	const { id } = await c.req.json();
 
 	await c.env.DB.prepare('INSERT INTO saved (id) VALUES (?)').bind(id).run();
@@ -70,7 +71,7 @@ app.post('/save-word', async (c: Context) => {
 	});
 });
 
-app.get('/random-word', async (c: Context) => {
+app.get('/random-word', async (c) => {
 	const randomSaved = await c.env.DB.prepare('SELECT * FROM saved ORDER BY RANDOM() LIMIT 1').first();
 
 	if (!randomSaved) {
